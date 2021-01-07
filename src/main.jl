@@ -10,8 +10,15 @@ function sim!(P, C, dt)
 end
 
 function sim!(P, C; dt = 0.1ms, duration = 10ms)
-    for t = 0ms:dt:(duration - dt)
-        sim!(P, C, dt)
+    sized = duration/dt
+    for p in P
+         if hasproperty(p, :spike_raster)
+              p.spike_raster::Vector{Int32} = zeros(trunc(Int, sized))
+         end
+         for t = 0ms:dt:duration
+              integrate!(p, p.param, Float32(dt))
+              record!(p)
+         end
     end
 end
 
